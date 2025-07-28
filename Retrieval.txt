@@ -1,0 +1,58 @@
+Here's what actually happens step by step:
+    
+    STEP 1: Query Rewriting (MultiQueryRetriever)
+    ├── LLM generates multiple query variations:
+    │   ├── Query 1: "What are the advantages of renewable energy sources?"
+    │   ├── Query 2: "How do renewable energy systems benefit the environment?"
+    │   ├── Query 3: "Why should we use renewable energy instead of fossil fuels?"
+    │   └── Query 4: "What are the environmental impacts of clean energy?"
+    
+    STEP 2: MMR Applied to EACH Generated Query
+    ├── Query 1 → MMR Retrieval:
+    │   ├── Finds 30 candidate documents (fetch_k=30)
+    │   ├── MMR selects 10 diverse, relevant docs (k=10)
+    │   └── Result: Documents about renewable advantages (diverse perspectives)
+    │
+    ├── Query 2 → MMR Retrieval:
+    │   ├── Finds 30 candidate documents  
+    │   ├── MMR selects 10 diverse, relevant docs
+    │   └── Result: Documents about environmental benefits (diverse angles)
+    │
+    ├── Query 3 → MMR Retrieval:
+    │   ├── Finds 30 candidate documents
+    │   ├── MMR selects 10 diverse, relevant docs  
+    │   └── Result: Documents comparing renewable vs fossil (diverse comparisons)
+    │
+    └── Query 4 → MMR Retrieval:
+        ├── Finds 30 candidate documents
+        ├── MMR selects 10 diverse, relevant docs
+        └── Result: Documents about clean energy impacts (diverse impacts)
+    
+    STEP 3: Combination & Deduplication
+    ├── Combine all MMR results: ~40 documents (some overlap expected)
+    ├── Remove duplicates based on content similarity
+    └── Final pool: ~25-30 unique documents with both query AND document diversity
+    
+    STEP 4: Re-ranking (LongContextReorder)
+    ├── Analyzes document lengths and content
+    ├── Reorders for optimal context window utilization
+    └── Places most important docs in optimal positions
+    
+    STEP 5: Contextual Compression
+    ├── LLM analyzes each document against original query
+    ├── Extracts only the most relevant passages
+    ├── Removes redundant or irrelevant content
+    └── Final result: Compressed, highly relevant document excerpts
+    
+    WHY THIS APPROACH WORKS WELL:
+    ├── Query Diversity: Captures different aspects of user intent
+    ├── Document Diversity: MMR ensures non-redundant results per query perspective  
+    ├── Comprehensive Coverage: Each query angle gets thorough, diverse exploration
+    ├── Quality Focus: Re-ranking and compression ensure final relevance
+    └── Rich Context: Multiple query perspectives provide comprehensive information
+    
+    PERFECT FOR:
+    ├── Complex information needs with multiple facets
+    ├── Domain-specific queries where terminology matters
+    ├── Comprehensive research requiring different perspectives
+    └── Cases where missing relevant docs due to query phrasing is costly
